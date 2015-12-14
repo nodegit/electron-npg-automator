@@ -33,4 +33,9 @@ downloadModule()
   .then(() => {
     console.log(`${new Date().toString()} preparing module`);
     return do_prepare(modulePath());
-  });
+  })
+  .catch (e => {
+    console.error('Error preparing to build:');
+    console.error(e);
+    process.exit(1);
+  })

@@ -13,9 +13,14 @@ module.exports = function downloadModule() {
 
 function download(url) {
   console.log(`${new Date().toString()} downloading module from ${url}`)
+  var token = getConfig('gh_token');
+  if (!token) {
+    return Promise.reject(new Error("The `gh_token` config isn't set. You're Gonna Have A Bad Time."));
+  }
+
   const opts = {
     headers: {
-      'Authorization': `token ${getConfig('gh_token')}`,
+      'Authorization': `token ${token}`,
       'User-Agent': 'electron-npg-automator'
     },
     url
