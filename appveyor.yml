@@ -16,6 +16,7 @@ install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - cmd: SET PATH=C:\Program Files (x86)\MSBuild\12.0\bin\;%PATH%
   - cmd: SET PATH=c:\python27;%PATH%
+  - cmd: BUILD_ONLY=true
   - cmd: npm install
   - cmd: npm run compile
   - cmd: node ci\prepare.js
