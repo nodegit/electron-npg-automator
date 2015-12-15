@@ -23,4 +23,9 @@ getTagInfo()
     electronVersion = electronVersion.replace('v', '');
 
     return buildScript(electronVersion, moduleParentPath(), modulePath());
+  })
+  .catch (e => {
+    console.error('Error building:');
+    console.error(e);
+    process.exit(1);
   });
