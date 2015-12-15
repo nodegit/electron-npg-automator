@@ -13,9 +13,12 @@ addons:
 branches:
   only:
     - master
+    - clangtest
     - /^ena-.*$/
 
 before_install:
+- clang -v
+- clang++ -v
 - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 - source $HOME/.bashrc
 - nvm install 0.12
