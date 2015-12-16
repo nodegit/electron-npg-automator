@@ -18,4 +18,9 @@ getTagInfo()
       }
       process.exit(0);
     });
+  })
+  .catch(e => {
+    console.error('Error pubishing:');
+    console.error(e);
+    process.exit(1);
   });
