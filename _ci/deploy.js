@@ -10,7 +10,7 @@ getTagInfo()
     var target = electronVersion.replace('v', '');
     var cmd = path.join(modulePath_, 'node_modules', '.bin', 'node-pre-gyp');
     cmd = [cmd, 'package', 'publish', '--runtime=electron', `--target=${target}`].join(' ');
-    var proc = cp.exec(cmd, {cwd: modulePath_}, function (err, stdout, stderr) {
+    var proc = cp.exec(cmd, {cwd: modulePath_, maxBuffer: Number.MAX_VALUE}, function (err, stdout, stderr) {
       console.log(stdout);
       console.error(stderr);
       if (err) {
