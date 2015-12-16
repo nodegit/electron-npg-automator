@@ -1,7 +1,7 @@
 sudo: false
 compiler: clang
 env:
-  - CC=clang CXX=clang++ npm_config_clang=1
+  - CC=clang CXX=clang++ npm_config_clang=1 BUILD_ONLY=true
 addons:
   apt:
     packages:
