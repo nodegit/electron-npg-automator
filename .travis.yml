@@ -10,6 +10,7 @@ addons:
     - libgnome-keyring-dev
     - fakeroot
     - libssl-dev
+    - g++-multilib
 
 branches:
   only:
@@ -23,6 +24,10 @@ before_install:
 - npm install
 - npm run compile
 
+- if [ $TARGET_ARCH == "ia32" ]; then
+    sudo ln -s /usr/include/asm-generic /usr/include/asm;
+  fi
+
 install:
 - node ci/prepare.js
 
@@ -35,3 +40,9 @@ after_success:
 os:
 - linux
 - osx
+
+matrix:
+  include:
+    - os: linux
+      env: CC=clang CXX=clang++ npm_config_clang=1 BUILD_ONLY=true GYP_DEFINES="use_obsolete_asm=true" TARGET_ARCH="ia32"
+      sudo: required

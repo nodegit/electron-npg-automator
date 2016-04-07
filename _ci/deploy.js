@@ -8,8 +8,16 @@ getTagInfo()
   .then(({electronVersion}) => {
     var modulePath_ = modulePath();
     var target = electronVersion.replace('v', '');
+    var targetArch = process.env.TARGET_ARCH;
     var cmd = path.join(modulePath_, 'node_modules', '.bin', 'node-pre-gyp');
-    cmd = [cmd, 'package', 'publish', '--runtime=electron', `--target=${target}`].join(' ');
+
+    cmd = [cmd, 'package', 'publish', '--runtime=electron', `--target=${target}`];
+
+    if (targetArch) {
+      cmd.push(`--target_arch=${targetArch}`)
+    }
+
+    cmd = cmd.join(' ');
     var proc = cp.exec(cmd, {cwd: modulePath_, maxBuffer: Number.MAX_VALUE}, function (err, stdout, stderr) {
       console.log(stdout);
       console.error(stderr);
