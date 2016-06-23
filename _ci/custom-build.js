@@ -10,21 +10,19 @@ module.exports = function(electronVersion, moduleParentPath, modulePath) {
 
     fs.writeFileSync(path.join(modulePath, '.npmrc'), npmrc);
 
-    const spawnedNPM = cp.spawn(
-      'npm',
-      ['install'],
-      {cwd: modulePath}
+    cp.exec(
+      'npm install',
+      {cwd: modulePath, maxBuffer: Number.MAX_VALUE},
+      function(err, stdout, stderr) {
+        console.log(stdout);
+        console.error(stderr);
+        if (err) {
+          reject(err);
+        }
+        else {
+          resolve();
+        }
+      }
     );
-
-    spawnedNPM.stdout.on('data', (data) => console.log(data.toString().trim()));
-    spawnedNPM.stderr.on('data', (data) => console.error(data.toString().trim()));
-    spawnedNPM.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      }
-      else {
-        reject(code);
-      }
-    });
   });
 };
