@@ -1,7 +1,7 @@
 sudo: false
 compiler: clang
 env:
-  - CC=clang CXX=clang++ npm_config_clang=1 BUILD_ONLY=true GYP_DEFINES="use_obsolete_asm=true"
+  - CC=clang CXX=clang++ npm_config_clang=1 BUILD_ONLY=true GYP_DEFINES="use_obsolete_asm=1"
 addons:
   apt:
     packages:
