@@ -16,7 +16,18 @@ module.exports = function downloadModule() {
       .then(downloadTarball);
   }
 
-  return gitCloneRepo();
+  return gitCloneRepo()
+    .then(() => new Promise((resolve, reject) => {
+      cp.exec(`git submodule update --init --recursive`, { cwd: moduleParentPath() }, (error, stderr, stdout) => {
+        if (error) {
+          console.log(`Could not update submodules. Error code: ${error}`);
+          console.log(stderr);
+          return reject(error);
+        }
+
+        resolve();
+      });
+    }));
 };
 
 function gitCloneRepo() {
