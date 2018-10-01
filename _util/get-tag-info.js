@@ -2,11 +2,19 @@ module.exports = function getTagInfo() {
   return new Promise((resolve, reject) => {
     const tag = getTag();
     if (!tag) {
-      return reject('no tag');
+      reject('no tag');
+      return;
     }
 
-    const [ena, moduleVersion, electronVersion] = tag.split('-');
-    resolve({moduleVersion, electronVersion});
+    const tagVersionRegex = /^ena-(v\d+\.\d+\.\d+(?:-(?:alpha|beta)\.\d+)?)-(v\d+\.\d+\.\d+(?:-(?:alpha|beta)\.\d+)?)/;
+    const regexResults = tagVersionRegex.exec(tag);
+    if (!regexResults) {
+      reject('tag does not match expected format');
+      return;
+    }
+
+    const [, moduleVersion, electronVersion] = regexResults;
+    resolve({ moduleVersion, electronVersion });
   });
 }
 
