@@ -1,6 +1,10 @@
 const { execSync } = require('child_process');
 
-const [, , newNodeGitVersion] = process.argv;
+const [, , oldNodeGitVersion, newNodeGitVersion] = process.argv;
+
+if (!/v\d+\.\d+\.\d+(?:-\w+\.\d+)?/.test(oldNodeGitVersion)) {
+  throw new Error('Must pass old NodeGit version tag in correct format. See Regex in script.');
+}
 
 if (!/v\d+\.\d+\.\d+(?:-\w+\.\d+)?/.test(newNodeGitVersion)) {
   throw new Error('Must pass new NodeGit version tag in correct format. See Regex in script.');
@@ -9,7 +13,10 @@ if (!/v\d+\.\d+\.\d+(?:-\w+\.\d+)?/.test(newNodeGitVersion)) {
 execSync('git tag -l')
   .toString()
   .split('\n')
-  .filter(a => a)
+  .filter(maybeTag =>
+    new RegExp(`ena-${oldNodeGitVersion}-v\\d+\\.\\d+\\.\\d+`)
+      .test(maybeTag)
+  )
   .map(tagString => {
     const maybeVersionInfo = /ena-v\d+\.\d+\.\d+(?:-\w+\.\d+)?-(v\d+\.\d+\.\d+)/.exec(tagString);
     if (!maybeVersionInfo) {
@@ -22,6 +29,7 @@ execSync('git tag -l')
   .forEach(newTag => {
     try {
       execSync(`git tag ${newTag}`);
+      console.log(newTag);
     } catch (e) {
       throw new Error(`Unable to create ${newTag} locally.`);
     }
