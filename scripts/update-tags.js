@@ -29,7 +29,6 @@ execSync('git tag -l')
   .forEach(newTag => {
     try {
       execSync(`git tag ${newTag}`);
-      console.log(newTag);
     } catch (e) {
       throw new Error(`Unable to create ${newTag} locally.`);
     }
