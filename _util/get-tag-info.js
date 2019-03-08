@@ -6,7 +6,7 @@ module.exports = function getTagInfo() {
       return;
     }
 
-    const tagVersionRegex = /^ena-(v\d+\.\d+\.\d+(?:-(?:alpha|beta)\.\d+)?)-(v\d+\.\d+\.\d+(?:-(?:alpha|beta)\.\d+)?)/;
+    const tagVersionRegex = /^ena-(v\d+\.\d+\.\d+(?:-\w+\.\d+)?)-(v\d+\.\d+\.\d+(?:-\w+\.\d+)?)/;
     const regexResults = tagVersionRegex.exec(tag);
     if (!regexResults) {
       reject('tag does not match expected format');
