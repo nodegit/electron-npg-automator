@@ -26,6 +26,20 @@ execSync('git tag -l')
     const [_, electronVersion] = maybeVersionInfo;
     return `ena-${newNodeGitVersion}-${electronVersion}`;
   })
+  .sort((a, b) => {
+    const electronVersionRegex = /ena-v\d+\.\d+\.\d+(?:-\w+\.\d+)?-v(\d+)\.(\d+)\.(\d+)/;
+    const [, aMajor, aMinor, aPatch] = electronVersionRegex.exec(a);
+    const [, bMajor, bMinor, bPatch] = electronVersionRegex.exec(b);
+
+    const majorDifference = aMajor - bMajor;
+    if (majorDifference !== 0) return majorDifference;
+
+    const minorDifference = aMinor - bMinor;
+    if (minorDifference !== 0) return minorDifference;
+
+    return aPatch - bPatch;
+  })
+  .reverse()
   .forEach(newTag => {
     try {
       execSync(`git tag ${newTag}`);
