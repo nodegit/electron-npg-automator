@@ -10,9 +10,13 @@ if (!/v\d+\.\d+\.\d+(?:-\w+\.\d+)?/.test(newNodeGitVersion)) {
   throw new Error('Must pass new NodeGit version tag in correct format. See Regex in script.');
 }
 
-execSync('git tag -l')
+const allTags = execSync('git tag -l')
   .toString()
   .split('\n')
+  .filter(a => a);
+const existingTags = new Set(allTags);
+
+const newTagList = allTags
   .filter(maybeTag =>
     new RegExp(`ena-${oldNodeGitVersion}-v\\d+\\.\\d+\\.\\d+`)
       .test(maybeTag)
@@ -40,6 +44,7 @@ execSync('git tag -l')
     return aPatch - bPatch;
   })
   .reverse()
+  .filter(newTag => !existingTags.has(newTag)) // Don't push tags that have already been built
   .forEach(newTag => {
     try {
       execSync(`git tag ${newTag}`);

@@ -20,6 +20,9 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Print Tag Ref
+        run: echo ${{ github.ref }}
+
       - uses: actions/checkout@master
 
       - name: Use Node.js 8.x
