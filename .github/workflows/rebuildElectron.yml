@@ -1,0 +1,63 @@
+on:
+  push:
+    tags:
+      - ena-*
+
+name: Rebuild for Electron
+
+jobs:
+  rebuild:
+    name: Rebuild
+    strategy:
+      matrix:
+        os: [windows-2016, ubuntu-16.04, macOS-10.14]
+        arch: [x86, x64]
+        exclude:
+          - os: macOS-10.14
+            arch: x86
+          - os: ubuntu-16.04
+            arch: x86
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js 8.x
+        uses: implausible/setup-node@feature/expose-architecture-override
+        with:
+          node-version: 8
+          node-arch: ${{ matrix.arch }}
+
+      - name: Install Dependencies for Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt install build-essential libssl-dev libkrb5-dev libc++-dev
+
+      - run: npm install
+      - run: npm run compile
+      - run: node ci/prepare.js
+        env:
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+      - run: node ci/build.js
+        env:
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+      - run: node ci/deploy.js
+        env:
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
