@@ -6,7 +6,7 @@ module.exports = function getTagInfo() {
       return;
     }
 
-    const tagVersionRegex = /^ena-(v\d+\.\d+\.\d+(?:-\w+\.\d+)?)-(v\d+\.\d+\.\d+(?:-\w+\.\d+)?)/;
+    const tagVersionRegex = /^refs\/tags\/ena-(v\d+\.\d+\.\d+(?:-\w+\.\d+)?)-(v\d+\.\d+\.\d+(?:-\w+\.\d+)?)/;
     const regexResults = tagVersionRegex.exec(tag);
     if (!regexResults) {
       reject('tag does not match expected format');
@@ -19,11 +19,5 @@ module.exports = function getTagInfo() {
 }
 
 function getTag() {
-  switch (process.platform) {
-    case 'win32':
-      return process.env.APPVEYOR_REPO_TAG_NAME;
-    case 'linux':
-    case 'darwin':
-      return process.env.TRAVIS_TAG;
-  }
+  return process.env.GITHUB_REF;
 }
