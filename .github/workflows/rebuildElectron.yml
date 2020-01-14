@@ -25,15 +25,23 @@ jobs:
 
       - uses: actions/checkout@master
 
-      - name: Use Node.js 8.x
+      - name: Use Node.js 12.x
         uses: implausible/setup-node@feature/expose-architecture-override
         with:
-          node-version: 8
+          node-version: 12
           node-arch: ${{ matrix.arch }}
 
       - name: Install Dependencies for Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt install build-essential libssl-dev libkrb5-dev libc++-dev
+
+      - name: Fix Node-Gyp for windows
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          npm install -g node-gyp@~6.0.1
+          $nodeGypLocation=npm root -g
+          npm config set node_gyp $nodeGypLocation\bin\node-gyp.js
+        shell: pwsh
 
       - run: npm install
       - run: npm run compile
