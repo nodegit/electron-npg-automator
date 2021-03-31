@@ -10,10 +10,10 @@ jobs:
     name: Rebuild
     strategy:
       matrix:
-        os: [windows-2016, ubuntu-16.04, macOS-10.14]
+        os: [windows-2016, ubuntu-16.04, macOS-10.15]
         arch: [x86, x64]
         exclude:
-          - os: macOS-10.14
+          - os: macOS-10.15
             arch: x86
           - os: ubuntu-16.04
             arch: x86
@@ -40,16 +40,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install build-essential libssl-dev libkrb5-dev libc++-dev
-
-      - name: Fix Node-Gyp for windows
-        if: startsWith(matrix.os, 'windows')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-        run: |
-          npm install -g node-gyp@~6.0.1
-          $nodeGypLocation=npm root -g
-          npm config set node_gyp $nodeGypLocation\bin\node-gyp.js
-        shell: pwsh
 
       - run: npm install
       - run: npm run compile
