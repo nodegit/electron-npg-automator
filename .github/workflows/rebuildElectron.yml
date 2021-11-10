@@ -6,24 +6,23 @@ on:
 name: Rebuild for Electron
 
 jobs:
-  rebuild:
-    name: Rebuild
+  rebuild-docker:
+    name: Rebuild docker
     strategy:
-      matrix:
-        os: [windows-2016, ubuntu-16.04, macOS-10.15]
-        arch: [x86, x64]
-        exclude:
-          - os: macOS-10.15
-            arch: x86
-          - os: ubuntu-16.04
-            arch: x86
       fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container: ubuntu:16.04
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
-      - uses: actions/checkout@master
+      - name: Install Dependencies for Ubuntu
+        # git >= 2.18 required for actions/checkout git support
+        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git build-essential clang python3 libssl-dev libkrb5-dev libc++-dev
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - uses: actions/checkout@v2
 
       - name: Use Node.js 12.x
         uses: implausible/setup-node@feature/expose-architecture-override
@@ -33,13 +32,9 @@ jobs:
           node-version: 12
           node-arch: ${{ matrix.arch }}
 
-      - name: Install Dependencies for Ubuntu
-        if: startsWith(matrix.os, 'ubuntu')
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-        run: |
-          sudo apt update
-          sudo apt install build-essential libssl-dev libkrb5-dev libc++-dev
+      # We're running in docker without other users
+      - name: Set npm config
+        run: npm config set unsafe-perm true
 
       - run: npm install
       - run: npm run compile
@@ -78,6 +73,140 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+
+  rebuild-windows:
+    name: Rebuild Windows
+    strategy:
+      matrix:
+        os: [windows-2016]
+        arch: [x86, x64]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Print Tag Ref
+        run: echo ${{ github.ref }}
+
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: implausible/setup-node@feature/expose-architecture-override
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        with:
+          node-version: 12
+          node-arch: ${{ matrix.arch }}
+
+      - run: npm install
+      - run: npm run compile
+      - run: node ci/prepare.js
+        env:
+          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
+          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
+          node_pre_gyp_accessKeyId: ${{ secrets.node_pre_gyp_accessKeyId }}
+          node_pre_gyp_secretAccessKey: ${{ secrets.node_pre_gyp_secretAccessKey }}
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-win32-${{ matrix.arch == 'x64' && 'x64' || 'ia32' }}.tar.gz
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+      - run: node ci/build.js
+        env:
+          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
+          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
+          node_pre_gyp_accessKeyId: ${{ secrets.node_pre_gyp_accessKeyId }}
+          node_pre_gyp_secretAccessKey: ${{ secrets.node_pre_gyp_secretAccessKey }}
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-win32-${{ matrix.arch == 'x64' && 'x64' || 'ia32' }}.tar.gz
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+      - run: node ci/deploy.js
+        env:
+          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
+          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
+          node_pre_gyp_accessKeyId: ${{ secrets.node_pre_gyp_accessKeyId }}
+          node_pre_gyp_secretAccessKey: ${{ secrets.node_pre_gyp_secretAccessKey }}
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-win32-${{ matrix.arch == 'x64' && 'x64' || 'ia32' }}.tar.gz
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+
+  rebuild-macos:
+    name: Rebuild macOS
+    strategy:
+      matrix:
+        os: [macOS-10.15]
+        arch: [x64]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Print Tag Ref
+        run: echo ${{ github.ref }}
+
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: implausible/setup-node@feature/expose-architecture-override
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        with:
+          node-version: 12
+          node-arch: ${{ matrix.arch }}
+
+      - run: npm install
+      - run: npm run compile
+      - run: node ci/prepare.js
+        env:
+          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
+          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
+          node_pre_gyp_accessKeyId: ${{ secrets.node_pre_gyp_accessKeyId }}
+          node_pre_gyp_secretAccessKey: ${{ secrets.node_pre_gyp_secretAccessKey }}
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-darwin-${{ matrix.arch }}.tar.gz
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+      - run: node ci/build.js
+        env:
+          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
+          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
+          node_pre_gyp_accessKeyId: ${{ secrets.node_pre_gyp_accessKeyId }}
+          node_pre_gyp_secretAccessKey: ${{ secrets.node_pre_gyp_secretAccessKey }}
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-darwin-${{ matrix.arch }}.tar.gz
+          GYP_DEFINES: use_obsolete_asm=true
+          BUILD_ONLY: true
+          electron_npg_automator_module: nodegit/nodegit
+          electron_npg_automator_use_git_clone: true
+      - run: node ci/deploy.js
+        env:
+          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
+          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
+          node_pre_gyp_accessKeyId: ${{ secrets.node_pre_gyp_accessKeyId }}
+          node_pre_gyp_secretAccessKey: ${{ secrets.node_pre_gyp_secretAccessKey }}
+          CC: clang
+          CXX: clang++
+          npm_config_clang: 1
+          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-darwin-${{ matrix.arch }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
