@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Dependencies for Ubuntu
         # git >= 2.18 required for actions/checkout git support
-        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git build-essential clang python3 libssl-dev libkrb5-dev libc++-dev
+        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
@@ -35,6 +35,10 @@ jobs:
       # We're running in docker without other users
       - name: Set npm config
         run: npm config set unsafe-perm true
+
+      # 16.04 comes with 1.0.2
+      - name: Install OpenSSL 1.1.1l
+        run: sh -c 'cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz.sha256 && echo "$(cat openssl-1.1.1l.tar.gz.sha256) openssl-1.1.1l.tar.gz" | sha256sum -c && tar xvf openssl-1.1.1l.tar.gz && cd openssl-1.1.1l && ./config no-ssl2 no-ssl3 no-comp && make && make test && make install'
 
       - run: npm install
       - run: npm run compile
