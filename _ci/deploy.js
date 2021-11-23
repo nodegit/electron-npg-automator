@@ -22,7 +22,7 @@ getTagInfo()
       console.log(stdout);
       console.error(stderr);
       if (err) {
-        process.exit(err);
+        process.exit(1);
       }
       process.exit(0);
     });
