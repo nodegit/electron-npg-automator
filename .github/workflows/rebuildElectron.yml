@@ -22,6 +22,20 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
+      - name: Setup python 3.6
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          mkdir ~/python
+          cd ~/python
+          wget https://www.python.org/ftp/python/3.6.15/Python-3.6.15.tgz
+          tar -xvf Python-3.6.15.tgz
+          cd Python-3.6.15
+          ./configure
+          make
+          make install
+
       - uses: actions/checkout@v2
 
       - name: Use Node.js 12.x
