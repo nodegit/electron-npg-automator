@@ -86,7 +86,7 @@ jobs:
     name: Rebuild Windows
     strategy:
       matrix:
-        os: [windows-2016]
+        os: [windows-2019]
         arch: [x86, x64]
       fail-fast: false
     runs-on: ${{ matrix.os }}
