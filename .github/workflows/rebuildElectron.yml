@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Dependencies for Ubuntu
         # git >= 2.18 required for actions/checkout git support
-        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev zlib
+        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
