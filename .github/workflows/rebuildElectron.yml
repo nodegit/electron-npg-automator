@@ -54,6 +54,7 @@ jobs:
       - name: Install OpenSSL 1.1.1l
         run: sh -c 'cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz.sha256 && echo "$(cat openssl-1.1.1l.tar.gz.sha256) openssl-1.1.1l.tar.gz" | sha256sum -c && tar xvf openssl-1.1.1l.tar.gz && cd openssl-1.1.1l && ./config no-ssl2 no-ssl3 no-comp && make && make test && make install'
 
+      - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
       - run: npm run compile
       - run: node ci/prepare.js
