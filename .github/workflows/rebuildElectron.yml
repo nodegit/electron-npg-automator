@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Dependencies for Ubuntu
         # git >= 2.18 required for actions/checkout git support
-        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev
+        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang-8 lld-8 python3 libkrb5-dev libc++-dev zlib1g-dev
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
@@ -57,7 +57,11 @@ jobs:
       - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
       - run: npm run compile
-      - run: node ci/prepare.js
+      - run: |
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
+          update-alternatives --install /usr/bin/ld ld /usr/bin/lld-8 100
+          node ci/prepare.js
         env:
           electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
@@ -67,10 +71,18 @@ jobs:
           CXX: clang++
           npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
+          AR: "/usr/lib/llvm-8/bin/llvm-ar"
+          NM: "/usr/lib/llvm-8/bin/llvm-nm"
+          # ranlib is not needed, and doesn't support .bc files in .a
+          RANLIB: /bin/true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
-      - run: node ci/build.js
+      - run: |
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
+          update-alternatives --install /usr/bin/ld ld /usr/bin/lld-8 100
+          node ci/build.js
         env:
           electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
@@ -80,10 +92,18 @@ jobs:
           CXX: clang++
           npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
+          AR: "/usr/lib/llvm-8/bin/llvm-ar"
+          NM: "/usr/lib/llvm-8/bin/llvm-nm"
+          # ranlib is not needed, and doesn't support .bc files in .a
+          RANLIB: /bin/true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
-      - run: node ci/deploy.js
+      - run: |
+          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
+          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
+          update-alternatives --install /usr/bin/ld ld /usr/bin/lld-8 100
+          node ci/deploy.js
         env:
           electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
@@ -93,6 +113,10 @@ jobs:
           CXX: clang++
           npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
+          AR: "/usr/lib/llvm-8/bin/llvm-ar"
+          NM: "/usr/lib/llvm-8/bin/llvm-nm"
+          # ranlib is not needed, and doesn't support .bc files in .a
+          RANLIB: /bin/true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
