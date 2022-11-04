@@ -51,8 +51,8 @@ jobs:
         run: npm config set unsafe-perm true
 
       # 16.04 comes with 1.0.2
-      - name: Install OpenSSL 1.1.1l
-        run: sh -c 'cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz.sha256 && echo "$(cat openssl-1.1.1l.tar.gz.sha256) openssl-1.1.1l.tar.gz" | sha256sum -c && tar xvf openssl-1.1.1l.tar.gz && cd openssl-1.1.1l && ./config no-ssl2 no-ssl3 no-comp && make && make test && make install'
+      - name: Install OpenSSL 1.1.1s
+        run: sh -c 'cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1s.tar.gz && wget https://www.openssl.org/source/openssl-1.1.1s.tar.gz.sha256 && echo "$(cat openssl-1.1.1s.tar.gz.sha256) openssl-1.1.1s.tar.gz" | sha256sum -c && tar xvf openssl-1.1.1s.tar.gz && cd openssl-1.1.1s && ./config no-ssl2 no-ssl3 no-comp && make && make test && make install'
 
       - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
@@ -130,7 +130,6 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
-          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-win32-${{ matrix.arch == 'x64' && 'x64' || 'ia32' }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -144,7 +143,6 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
-          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-win32-${{ matrix.arch == 'x64' && 'x64' || 'ia32' }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -158,7 +156,6 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
-          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-win32-${{ matrix.arch == 'x64' && 'x64' || 'ia32' }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -197,7 +194,6 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
-          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-darwin-${{ matrix.arch }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -211,7 +207,6 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
-          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-darwin-${{ matrix.arch }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -225,7 +220,6 @@ jobs:
           CC: clang
           CXX: clang++
           npm_config_clang: 1
-          npm_config_openssl_bin_url: https://axonodegit.s3.amazonaws.com/nodegit/nodegit/openssl-1.1.1l-darwin-${{ matrix.arch }}.tar.gz
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit

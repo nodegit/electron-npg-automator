@@ -5,7 +5,7 @@ const path = require('path');
 module.exports = function(electronVersion, moduleParentPath, modulePath) {
   return new Promise(function(resolve, reject) {
     let npmrc = 'runtime = electron\n';
-    npmrc += 'disturl = https://atom.io/download/atom-shell\n';
+    npmrc += 'disturl = https://electronjs.org/headers\n';
     npmrc += `target = ${electronVersion.replace('v', '')}`;
 
     fs.writeFileSync(path.join(modulePath, '.npmrc'), npmrc);
