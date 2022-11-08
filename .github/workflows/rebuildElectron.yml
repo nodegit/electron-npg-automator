@@ -11,30 +11,16 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
-    container: ubuntu:16.04
+    container: ubuntu:18.04
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
       - name: Install Dependencies for Ubuntu
         # git >= 2.18 required for actions/checkout git support
-        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev
+        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-      - name: Setup python 3.6
-        env:
-          CC: clang
-          CXX: clang++
-        run: |
-          mkdir ~/python
-          cd ~/python
-          wget https://www.python.org/ftp/python/3.6.15/Python-3.6.15.tgz
-          tar -xvf Python-3.6.15.tgz
-          cd Python-3.6.15
-          ./configure
-          make
-          make install
 
       - uses: actions/checkout@v2
 
@@ -49,10 +35,6 @@ jobs:
       # We're running in docker without other users
       - name: Set npm config
         run: npm config set unsafe-perm true
-
-      # 16.04 comes with 1.0.2
-      - name: Install OpenSSL 1.1.1s
-        run: sh -c 'cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1s.tar.gz && wget https://www.openssl.org/source/openssl-1.1.1s.tar.gz.sha256 && echo "$(cat openssl-1.1.1s.tar.gz.sha256) openssl-1.1.1s.tar.gz" | sha256sum -c && tar xvf openssl-1.1.1s.tar.gz && cd openssl-1.1.1s && ./config no-ssl2 no-ssl3 no-comp && make && make test && make install'
 
       - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
