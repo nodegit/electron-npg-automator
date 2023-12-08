@@ -24,12 +24,12 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 14
         uses: implausible/setup-node@feature/expose-architecture-override
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 12
+          node-version: 14
           node-arch: ${{ matrix.arch }}
 
       # We're running in docker without other users
@@ -93,12 +93,12 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 14
         uses: implausible/setup-node@feature/expose-architecture-override
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 12
+          node-version: 14
           node-arch: ${{ matrix.arch }}
 
       - run: npm install
@@ -157,12 +157,12 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: Use Node.js 12.x
+      - name: Use Node.js 14
         uses: implausible/setup-node@feature/expose-architecture-override
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 12
+          node-version: 14
           node-arch: ${{ matrix.arch }}
 
       - run: npm install
