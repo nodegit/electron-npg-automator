@@ -18,5 +18,10 @@
     "fs-extra": "^0.26.2",
     "request": "^2.65.0",
     "tar": "^2.2.1"
+  },
+  "overrides": {
+    "electron-rebuild": {
+      "node-gyp": "^10.0.1"
+    }
   }
 }
