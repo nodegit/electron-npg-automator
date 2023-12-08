@@ -101,6 +101,11 @@ jobs:
           node-version: 14
           node-arch: ${{ matrix.arch }}
 
+      - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
       - run: npm install
       - run: npm run compile
       - run: node ci/prepare.js
@@ -164,6 +169,11 @@ jobs:
         with:
           node-version: 14
           node-arch: ${{ matrix.arch }}
+
+      - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
       - run: npm install
       - run: npm run compile
