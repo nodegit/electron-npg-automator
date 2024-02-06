@@ -22,15 +22,16 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
-      - uses: actions/checkout@v2
+      # v4 requires node 20, which won't run due to GLIBC 2.28+ requirement
+      - uses: actions/checkout@v3
 
+      # v4 requires node 20, which won't run due to GLIBC 2.28+ requirement
       - name: Use Node.js 16
-        uses: implausible/setup-node@feature/expose-architecture-override
+        uses: actions/setup-node@v3
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           node-version: 16
-          node-arch: ${{ matrix.arch }}
 
       # We're running in docker without other users
       - name: Set npm config
@@ -91,15 +92,15 @@ jobs:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Use Node.js 16
-        uses: implausible/setup-node@feature/expose-architecture-override
+        uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           node-version: 16
-          node-arch: ${{ matrix.arch }}
+          architecture: ${{ matrix.arch }}
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
         uses: actions/setup-python@v4
@@ -160,15 +161,15 @@ jobs:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Use Node.js 16
-        uses: implausible/setup-node@feature/expose-architecture-override
+        uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           node-version: 16
-          node-arch: ${{ matrix.arch }}
+          architecture: ${{ matrix.arch }}
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
         uses: actions/setup-python@v4
