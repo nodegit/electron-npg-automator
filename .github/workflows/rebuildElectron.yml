@@ -153,10 +153,9 @@ jobs:
     name: Rebuild macOS
     strategy:
       matrix:
-        os: [macos-12]
-        arch: [x64]
+        arch: [x64, arm64]
       fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-12' }}
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
