@@ -153,7 +153,7 @@ jobs:
     name: Rebuild macOS
     strategy:
       matrix:
-        os: [macOS-11]
+        os: [macos-12]
         arch: [x64]
       fail-fast: false
     runs-on: ${{ matrix.os }}
