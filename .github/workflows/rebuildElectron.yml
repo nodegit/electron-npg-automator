@@ -11,31 +11,26 @@ jobs:
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
-    container: ubuntu:18.04
+    container: ubuntu:22.04
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
       - name: Install Dependencies for Ubuntu
         # git >= 2.18 required for actions/checkout git support
-        run: apt update && apt install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && apt update && apt install -y git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
+        run: apt update && apt install -y software-properties-common git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
-      # v4 requires node 20, which won't run due to GLIBC 2.28+ requirement
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      # v4 requires node 20, which won't run due to GLIBC 2.28+ requirement
-      - name: Use Node.js 16
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 16
-
-      # We're running in docker without other users
-      - name: Set npm config
-        run: npm config set unsafe-perm true
+          node-version: 20
+          architecture: ${{ matrix.arch }}
 
       - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
@@ -94,12 +89,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 16
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 16
+          node-version: 20
           architecture: ${{ matrix.arch }}
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
@@ -162,12 +157,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 16
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 16
+          node-version: 20
           architecture: ${{ matrix.arch }}
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
