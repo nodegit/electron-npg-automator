@@ -155,7 +155,7 @@ jobs:
       matrix:
         arch: [x64, arm64]
       fail-fast: false
-    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-12' }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-13' }}
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
