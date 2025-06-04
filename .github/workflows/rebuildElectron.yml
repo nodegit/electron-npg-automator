@@ -79,7 +79,7 @@ jobs:
     name: Rebuild Windows
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         arch: [x64]
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -89,12 +89,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 20
+          node-version: 22
           architecture: ${{ matrix.arch }}
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
