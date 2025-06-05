@@ -110,9 +110,6 @@ jobs:
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
           AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: clang
-          CXX: clang++
-          npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -123,9 +120,6 @@ jobs:
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
           AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: clang
-          CXX: clang++
-          npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
@@ -136,9 +130,6 @@ jobs:
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
           AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: clang
-          CXX: clang++
-          npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
           BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
