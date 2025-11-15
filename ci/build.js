@@ -1,41 +1,36 @@
+const fs = require('fs/promises');
 const cp = require('child_process');
-const fs = require('fs');
+const getTagInfo = require('../util/get-tag-info');
+const modulePath = require('../util/module-path');
 const path = require('path');
+const downloadModule = require('../util/download-module');
 
-module.exports = function(electronVersion, moduleParentPath, modulePath) {
+(async () => {
+  await downloadModule();
+
+  const tagInfo = await getTagInfo();
+  const electronVersion = tagInfo.electronVersion.replace('v', '');
+
+  let npmrc = 'runtime = electron\n';
+  npmrc += 'disturl = https://electronjs.org/headers\n';
+  npmrc += `target = ${electronVersion.replace('v', '')}`;
+  if (process.env.TARGET_ARCH) {
+    npmrc += `\narch = ${process.env.TARGET_ARCH}`;
+  }
+
+  await fs.writeFile(path.join(modulePath(), '.npmrc'), npmrc);
+
   return new Promise(function(resolve, reject) {
-    let npmrc = 'runtime = electron\n';
-    npmrc += 'disturl = https://electronjs.org/headers\n';
-    npmrc += `target = ${electronVersion.replace('v', '')}`;
-
-    fs.writeFileSync(path.join(modulePath, '.npmrc'), npmrc);
-
-    if (process.platform === 'win32') {
-      cp.exec(
-        'npm install',
-        {cwd: modulePath, maxBuffer: Number.MAX_VALUE},
-        function(err, stdout, stderr) {
-          console.log(stdout);
-          console.error(stderr);
-          if (err) {
-            reject(err);
-          }
-          else {
-            resolve();
-          }
-        }
-      );
-      return;
-    }
-
     const spawnedNPM = cp.spawn(
-      'npm',
-      ['install'],
-      { cwd: modulePath }
+      'npm install',
+      {
+        cwd: modulePath(),
+        shell: true
+      }
     );
 
-    spawnedNPM.stdout.on('data', data => console.log(data && data.toString().trim()));
-    spawnedNPM.stderr.on('data', data => console.log(data && data.toString().trim()));
+    spawnedNPM.stdout.on('data', data => console.log(data && data.toString()));
+    spawnedNPM.stderr.on('data', data => console.log(data && data.toString()));
     spawnedNPM.on('close', (code) => {
       if (code === 0) {
         resolve();
@@ -44,4 +39,4 @@ module.exports = function(electronVersion, moduleParentPath, modulePath) {
       }
     })
   });
-};
+})();

@@ -17,24 +17,23 @@ jobs:
         run: echo ${{ github.ref }}
 
       - name: Install Dependencies for Ubuntu
-        # git >= 2.18 required for actions/checkout git support
         run: apt update && apt install -y software-properties-common git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 20
+          node-version: 22
           architecture: ${{ matrix.arch }}
 
       - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
-      - run: node ci/build.js
+      - name: Build & Deploy
         env:
           electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
@@ -44,31 +43,19 @@ jobs:
           CXX: clang++
           npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
-          BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
-      - run: node ci/deploy.js
-        env:
-          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
-          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: clang
-          CXX: clang++
-          npm_config_clang: 1
-          GYP_DEFINES: use_obsolete_asm=true
-          BUILD_ONLY: true
-          electron_npg_automator_module: nodegit/nodegit
-          electron_npg_automator_use_git_clone: true
+        run: |
+          node ci/build.js
+          node ci/deploy.js
 
   rebuild-windows:
     name: Rebuild Windows
     strategy:
       matrix:
-        os: [windows-2022]
-        arch: [x64]
+        arch: [x64, arm64]
       fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
@@ -81,7 +68,6 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           node-version: 22
-          architecture: ${{ matrix.arch }}
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
         uses: actions/setup-python@v4
@@ -89,26 +75,19 @@ jobs:
           python-version: '3.11'
 
       - run: npm install
-      - run: node ci/build.js
+      - name: Build & Deploy
         env:
           electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
           AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
           GYP_DEFINES: use_obsolete_asm=true
-          BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
-      - run: node ci/deploy.js
-        env:
-          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
-          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          GYP_DEFINES: use_obsolete_asm=true
-          BUILD_ONLY: true
-          electron_npg_automator_module: nodegit/nodegit
-          electron_npg_automator_use_git_clone: true
+          TARGET_ARCH: ${{ matrix.arch }}
+        run: |
+          node ci/build.js
+          node ci/deploy.js
 
   rebuild-macos:
     name: Rebuild macOS
@@ -116,20 +95,19 @@ jobs:
       matrix:
         arch: [x64, arm64]
       fail-fast: false
-    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-13' }}
+    runs-on: ${{ matrix.arch == 'x64' && 'macos-15-intel' || 'macos-15' }}
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
-          node-version: 20
-          architecture: ${{ matrix.arch }}
+          node-version: 22
 
       - name: Use Python 3.11 # node-gyp < 10 breaks with 3.12
         uses: actions/setup-python@v4
@@ -137,7 +115,7 @@ jobs:
           python-version: '3.11'
 
       - run: npm install
-      - run: node ci/build.js
+      - name: Build & Deploy
         env:
           electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
@@ -147,19 +125,8 @@ jobs:
           CXX: clang++
           npm_config_clang: 1
           GYP_DEFINES: use_obsolete_asm=true
-          BUILD_ONLY: true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
-      - run: node ci/deploy.js
-        env:
-          electron_npg_automator_gh_token: ${{ secrets.electron_npg_automator_gh_token }}
-          node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: clang
-          CXX: clang++
-          npm_config_clang: 1
-          GYP_DEFINES: use_obsolete_asm=true
-          BUILD_ONLY: true
-          electron_npg_automator_module: nodegit/nodegit
-          electron_npg_automator_use_git_clone: true
+        run: |
+          node ci/build.js
+          node ci/deploy.js
