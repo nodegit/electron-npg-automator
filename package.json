@@ -4,9 +4,6 @@
   "description": "Automate node-pre-gyp deployment of native modules for electron",
   "main": "index.js",
   "scripts": {
-    "compile": "babel --presets es2015 -d ./ci ./_ci && babel --presets es2015 -d ./server ./_server && babel --presets es2015 -d ./util ./_util",
-    "install": "npm run compile",
-    "start": "node server/main.js"
   },
   "author": "Max Korp <maxkorp@8bytealchemy.com>",
   "license": "ISC",
