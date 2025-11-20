@@ -10,14 +10,41 @@ jobs:
     name: Rebuild docker
     strategy:
       fail-fast: false
+      matrix:
+        arch: [x64, arm64]
     runs-on: ubuntu-latest
     container: ubuntu:22.04
     steps:
       - name: Print Tag Ref
         run: echo ${{ github.ref }}
 
-      - name: Install Dependencies for Ubuntu
-        run: apt update && apt install -y software-properties-common git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
+      - name: Install Dependencies for Ubuntu (x64)
+        if: matrix.arch == 'x64'
+        run: |
+          apt update
+          apt install -y software-properties-common git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
+
+      - name: Install Dependencies for Ubuntu (arm64)
+        if: matrix.arch == 'arm64'
+        run: |
+          apt update
+
+          apt-get install -y git curl python3 build-essential
+
+          sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
+
+          dpkg --add-architecture arm64
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" > /etc/apt/sources.list.d/arm64-ports.list && \
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list.d/arm64-ports.list && \
+          echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" >> /etc/apt/sources.list.d/arm64-ports.list
+
+          apt-get update
+
+          apt install -y \
+              libssl-dev  libssl-dev:arm64 \
+              libkrb5-dev libkrb5-dev:arm64 \
+              libxml2     libxml2:arm64 \
+              gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
@@ -29,7 +56,6 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           node-version: 22
-          architecture: ${{ matrix.arch }}
 
       - run: git config --global --add safe.directory /__w/electron-npg-automator/electron-npg-automator
       - run: npm install
@@ -39,12 +65,13 @@ jobs:
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
           AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: clang
-          CXX: clang++
-          npm_config_clang: 1
+          CC: ${{ matrix.arch == 'x64' && 'clang' || 'aarch64-linux-gnu-gcc' }}
+          CXX: ${{ matrix.arch == 'x64' && 'clang++' || 'aarch64-linux-gnu-g++' }}
+          npm_config_clang: ${{ matrix.arch == 'x64' && '1' || '0' }}
           GYP_DEFINES: use_obsolete_asm=true
           electron_npg_automator_module: nodegit/nodegit
           electron_npg_automator_use_git_clone: true
+          TARGET_ARCH: ${{ matrix.arch }}
         run: |
           node ci/build.js
           node ci/deploy.js

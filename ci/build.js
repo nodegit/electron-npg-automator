@@ -22,7 +22,7 @@ const downloadModule = require('../util/download-module');
 
   return new Promise(function(resolve, reject) {
     const spawnedNPM = cp.spawn(
-      'npm install',
+      'npm install --verbose',
       {
         cwd: modulePath(),
         shell: true
