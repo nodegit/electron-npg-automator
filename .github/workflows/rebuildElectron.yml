@@ -22,7 +22,11 @@ jobs:
         if: matrix.arch == 'x64'
         run: |
           apt update
-          apt install -y software-properties-common git wget build-essential clang python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev
+          apt install -y software-properties-common git wget build-essential python3 libkrb5-dev libc++-dev zlib1g-dev libssl-dev gnupg lsb-release
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /usr/share/keyrings/llvm.gpg
+          echo "deb [signed-by=/usr/share/keyrings/llvm.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" > /etc/apt/sources.list.d/llvm.list
+          apt update
+          apt install -y clang-18
 
       - name: Install Dependencies for Ubuntu (arm64)
         if: matrix.arch == 'arm64'
@@ -65,8 +69,8 @@ jobs:
           node_pre_gyp_bucket: ${{ secrets.node_pre_gyp_bucket }}
           AWS_ACCESS_KEY_ID: ${{ secrets.node_pre_gyp_accessKeyId }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.node_pre_gyp_secretAccessKey }}
-          CC: ${{ matrix.arch == 'x64' && 'clang' || 'aarch64-linux-gnu-gcc' }}
-          CXX: ${{ matrix.arch == 'x64' && 'clang++' || 'aarch64-linux-gnu-g++' }}
+          CC: ${{ matrix.arch == 'x64' && 'clang-18' || 'aarch64-linux-gnu-gcc' }}
+          CXX: ${{ matrix.arch == 'x64' && 'clang++-18' || 'aarch64-linux-gnu-g++' }}
           npm_config_clang: ${{ matrix.arch == 'x64' && '1' || '0' }}
           GYP_DEFINES: use_obsolete_asm=true
           electron_npg_automator_module: nodegit/nodegit
